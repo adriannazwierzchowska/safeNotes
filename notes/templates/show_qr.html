@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h2>TOTP Authentication</h2>
+<p>Scan the QR code using an authenticator app:</p>
+<img src="https://api.qrserver.com/v1/create-qr-code/?data={{ qr_code_url }}&size=300x300">
+<p>Or enter this code in the app: <strong>{{ qr_code_url.split('secret=')[1] }}</strong></p>
+
+{% endblock %}

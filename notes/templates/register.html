@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<h2>Register</h2>
+<form id="auth-form" action="{{url_for('main.register')}}" method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.username.label }}<br>
+        {{ form.username(size=40) }}
+        {% for error in form.username.errors %}
+        <span class="error">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.email.label }}<br>
+        {{ form.email(size=40) }}
+        {% for error in form.email.errors %}
+        <span class="error">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.password.label }}<br>
+        {{ form.password(size=40) }}
+        {% for error in form.password.errors %}
+        <span class="error">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.confirm.label }}<br>
+        {{ form.confirm(size=50) }}
+        {% for error in form.confirm.errors %}
+        <span class="error">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+{% endblock %}
