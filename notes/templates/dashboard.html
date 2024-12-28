@@ -2,9 +2,10 @@
 
 {% block body %}
 <div class="container">
-    <h1>Welcome, {{username | e }}</h1>
-    <p>This is your dashboard</p>
+    <h1>Welcome, {{ username | e }}</h1>
+    <p>Manage your notes here.</p>
+    <a href="{{ url_for('main.notes') }}" class="btn btn-logout">Your notes</a>
+    <a href="{{ url_for('main.add_note') }}" class="btn btn-logout">Add a note</a>
     <a href="{{ url_for('main.logout') }}" class="btn btn-logout">Logout</a>
-</form>
 </div>
 {% endblock %}

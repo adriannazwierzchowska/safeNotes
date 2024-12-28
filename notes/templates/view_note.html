@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+    <h1>Decrypted Note</h1>
+    <h3>{{ note.title  }}</h3>
+    <div>{{ decrypted_content | safe }}</div>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-logout">Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -121,6 +121,7 @@ footer {
   padding: 1rem;
   position: fixed;
   width: 100%;
+  height: 10px;
   bottom: 0;
 }
 
@@ -132,6 +133,7 @@ footer {
 
 .flash-message {
   padding: 1em;
+
   margin-bottom: 1em;
   border-radius: 5px;
   font-size: 1rem;
@@ -154,3 +156,83 @@ footer {
   color: #004085;
   border: 1px solid #b8daff;
 }
+
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10rem;
+}
+
+.note {
+  background-color: #FDFCF5;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.note h3 {
+  font-size: 1.25rem;
+  color: #847D69;
+  margin-bottom: 0.5rem;
+}
+
+.note p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.note form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.note form input[type="password"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.note form button {
+  background-color: #A59D84;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.note form button:hover {
+  background-color: #847D69;
+}
+
+.note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background-color: #FDFCF5;
+    padding: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+

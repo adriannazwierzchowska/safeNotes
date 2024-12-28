@@ -10,3 +10,7 @@ __pycache__/
 *.pyo
 
 *.cfg
+
+notes/Include/
+notes/Lib/
+notes/Scripts/

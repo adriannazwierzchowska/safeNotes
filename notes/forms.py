@@ -1,4 +1,4 @@
-from wtforms import StringField, PasswordField, SubmitField, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, ValidationError, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 from flask_wtf import FlaskForm
 import math
@@ -31,6 +31,20 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
+class NoteForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired(), Length(max=30), Regexp(r'^[a-zA-Z0-9_]+$')])
+    content = StringField('Write your note here.', validators=[DataRequired()])
+    is_encrypted = BooleanField('Do you want to encrypt the note?')
+    code = StringField('Code')
+    submit = SubmitField('Add note')
+
+    def validate_code(self, field):
+        if self.is_encrypted.data and (not field.data or len(field.data) < 3 or len(field.data) > 20):
+            raise ValidationError("Incorrect code size.")
+
+class DecryptNoteForm(FlaskForm):
+    code = StringField('Code', validators=[DataRequired(), Length(min=3, max=20), password_strength_check])
+    submit = SubmitField('Decrypt')
 
 
 
