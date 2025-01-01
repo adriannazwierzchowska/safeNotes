@@ -6,25 +6,34 @@
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.title.label }}
-            {{ form.title() | e }}
+            {{ form.title() }}
         </div>
         <div class="form-group">
             {{ form.content.label }}
-            {{ form.content() | e }}
+            {{ form.content }}
+        </div>
+        <div class="form-group">
+            {{ form.is_public.label }}
+            {{ form.is_public() }}
+        </div>
+        <div class="form-group">
+            {{ form.is_shared.label }}
+            {{ form.is_shared() }}
+        </div>
+        <div>
+            {{ form.shared_users.label }}<br>
+            {{ form.shared_users(size=60) }}
         </div>
         <div class="form-group">
             {{ form.is_encrypted.label }}
-            {{ form.is_encrypted() | e }}
+            {{ form.is_encrypted() }}
         </div>
         <div class="form-group">
             {{ form.code.label }}
-            {{ form.code() | e }}
-            {% for error in form.code.errors %}
-            <span class="error">{{ error }}</span>
-            {% endfor %}
+            {{ form.code() }}
         </div>
         <div class="form-group">
-            {{ form.submit() | e }}
+            {{ form.submit() }}
         </div>
     </form>
 </div>

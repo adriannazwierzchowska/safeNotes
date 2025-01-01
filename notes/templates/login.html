@@ -8,23 +8,14 @@
     <p>
         {{ form.username.label }}<br>
         {{ form.username(size=40) }}
-        {% for error in form.username.errors %}
-        <span class="error">{{ error }}</span>
-        {% endfor %}
     </p>
     <p>
         {{ form.password.label }}<br>
         {{ form.password(size=50) }}
-        {% for error in form.password.errors %}
-        <span class="error">{{ error }}</span>
-        {% endfor %}
     </p>
     <p>
         {{ form.totp.label }}<br>
         {{ form.totp(size=6) }}
-        {% for error in form.password.errors %}
-        <span class="error">{{ error }}</span>
-        {% endfor %}
     </p>
     <p>{{ form.submit() }}</p>
 </form>

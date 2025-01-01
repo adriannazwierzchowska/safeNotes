@@ -5,10 +5,10 @@
     <h3>These are your notes.</h3>
     {% for note in notes %}
         <div class="note">
-        <h3>{{ note.title }}</h3>
+        <h3>{{ note.title | safe }}</h3>
         <p>
             {% if not note.is_encrypted %}
-                {{ note.content | safe }}
+                {{ note.clean_content | safe }}
             {% else %}
                 <i>Encrypted note (decrypt to view)</i>
             {% endif %}

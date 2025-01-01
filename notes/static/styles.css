@@ -53,7 +53,9 @@ a:hover {
 h1, h2 {
   color: #C1BAA1;
 }
-
+h3 {
+  color: #847D69;
+}
 form {
   display: flex;
   flex-direction: column;
@@ -83,7 +85,6 @@ form input[type="submit"]:hover {
   background-color: #847D69;
 }
 
-/* Buttons */
 .btn {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -96,21 +97,12 @@ form input[type="submit"]:hover {
   transition: background-color 0.3s ease;
 }
 
-.btn-login {
+.btn-nav {
   background-color: #A59D84;
   color: #fff;
 }
 
-.btn-login:hover {
-  background-color: #847D69;
-}
-
-.btn-logout {
-  background-color: #A59D84;
-  color: #fff;
-}
-
-.btn-logout:hover {
+.btn-nav:hover {
   background-color: #847D69;
 }
 
@@ -121,8 +113,9 @@ footer {
   padding: 1rem;
   position: fixed;
   width: 100%;
-  height: 10px;
+  height: 5px;
   bottom: 0;
+  margin-top: 5px;
 }
 
 .flash-messages {
@@ -235,4 +228,24 @@ footer {
     flex-direction: column;
     gap: 0.5rem;
 }
+
+.note img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 2px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+
 

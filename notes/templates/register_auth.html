@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container">
+    <h2>Your registration is not complete yet</h2>
+    <p>To continue the registration please scan the QR code using an authenticator app:</p>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ qr_code_url }}&size=300x300">
+    <p>Or enter this code in the app: <strong>{{ qr_code_url.split('secret=')[1] }}</strong></p>
+    <p>After scanning the QR code, please enter your TOTP code below to verify your account:</p>
+    <form id="totp-form" action="{{ url_for('main.register_auth') }}" method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.totp.label }}<br>
+            {{ form.totp(size=6) }}
+            {% for error in form.totp.errors %}
+            <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</div>
+{% endblock %}
