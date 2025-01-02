@@ -33,7 +33,7 @@ def home():
     return render_template("index.html", notes=public_notes, decrypt_form=decrypt_form)
 
 @app_bp.route("/login", methods=["POST", "GET"])
-@limiter.limit("5 per minute", key_func=lambda: request.remote_addr)
+@limiter.limit("5 per minute", key_func=lambda: request.remote_addr, methods=['POST'])
 def login():
     form = LoginForm()
     try:
@@ -62,7 +62,7 @@ def login():
     return render_template("login.html", form=form)
 
 @app_bp.route("/register", methods=["POST", "GET"]) #TODO - ADD ANOTHER LAYER OF CHECKING INPUT?
-@limiter.limit("5 per minute", key_func=lambda: request.remote_addr)
+@limiter.limit("5 per minute", key_func=lambda: request.remote_addr, methods=['POST'])
 def register():
     form = RegistrationForm()
     try:
@@ -105,7 +105,7 @@ def register():
     return render_template("register.html", form=form)
 
 @app_bp.route("/register-auth", methods=["POST", "GET"])
-@limiter.limit("5 per minute", key_func=lambda: request.remote_addr)
+@limiter.limit("5 per minute", key_func=lambda: request.remote_addr, methods=['POST'])
 def register_auth():
     form = TOTPAuthForm()
     if "new_user" not in session:
@@ -117,12 +117,13 @@ def register_auth():
 
     if request.method == "POST" and form.validate_on_submit():
         totp_code = form.totp.data
-
         try:
             new_user = User(username=new_user_data["username"], email=new_user_data["email"], password_hashed=new_user_data["password_hashed"], totp_secret=new_user_data["totp_secret"])
             if not new_user.check_totp(totp_code):
                 flash("Invalid TOTP code. Please try again.", "danger")
                 return redirect(url_for("main.register_auth"))
+
+            new_user.generate_rsa_keys()
 
             db.session.add(new_user)
             db.session.commit()
@@ -170,7 +171,16 @@ def notes():
         notes = user_notes + shared_notes
         for note in notes:
             if not note.is_encrypted:
-                note.clean_content = sanitize_markdown(note.content)
+                if not note.verify_signature():
+                    current_app.logger.warning(f"Failed: Signature for note {note.id} failed for user {current_user.username} from {request.remote_addr}")
+                    flash(f"Signature verification for note titled '{note.title}' failed.", "danger")
+                try:
+                    note.clean_content = sanitize_markdown(note.content)
+                    current_app.logger.info(f"Success: Displayed signed note {note.id} for user {current_user.username} from {request.remote_addr}")
+                except (ValueError, TypeError):
+                    current_app.logger.warning(f"Failed: Invalid signature for note {note.id} by user {current_user.username} from {request.remote_addr}")
+                    flash("You do not have permission to view this note.", "danger")
+                    return redirect(url_for("main.dashboard"))
     except Exception as e:
         current_app.logger.exception(f"Error: loading notes for user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
         flash("An unexpected error occurred. Please try again.", "danger")
@@ -181,6 +191,7 @@ def notes():
 @login_required
 def add_note():
     form = NoteForm()
+    print(form.validate_on_submit())
     try:
         if request.method == "POST" and form.validate_on_submit():
             title = form.title.data
@@ -199,9 +210,10 @@ def add_note():
                     return render_template("add_note.html", form=form)
                 note.encrypt(content.encode('utf-8'), code.encode('utf-8'))
 
-            #new_note.sign(private_key=current_user.private_key)
             db.session.add(note)
             db.session.flush()
+
+            note.sign_note()
 
             if is_shared and shared_users:
                 usernames = [username.strip() for username in shared_users.split(',')]
@@ -210,11 +222,17 @@ def add_note():
                     if user:
                         shared_note = SharedNotes(user_id=user.id, note_id=note.id)
                         db.session.add(shared_note)
+                        db.session.flush()
+                        shared_note.sign_shared_note()
                     else:
                         flash(f"Skipping users that do not exist.", "danger")
             db.session.commit()
             current_app.logger.info(f"Success: added a note id:{note.id} for {request.remote_addr} user '{current_user.username}' at {time.strftime('%Y-%m-%d %H:%M:%S')}")
             flash("Note saved successfully!", "success")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"{field}: {error}", "danger")
     except Exception as e:
         current_app.logger.exception(f"Error while adding a note: {request.remote_addr} for {current_user.username} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
         flash("An unexpected error occurred. Please try again.", "danger")
@@ -232,58 +250,35 @@ def decrypt_notes(note_id):
             note = Note.query.filter_by(id=note_id).first()
 
             if not note:
-                current_app.logger.warning(f"Failed: Note {note_id} for decrypting not found for user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                current_app.logger.warning(f"Failed: Note {note.id} for decrypting not found for user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
                 flash("Note not found or you do not have permission to view it.", "danger")
                 return redirect(url_for("main.dashboard"))
-            if not note.is_public and note.author_id != current_user.id:
-                current_app.logger.warning(f"Failed: Unauthorized access attempt for note {note_id} by user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
-                flash("You do not have permission to view this note.", "danger")
+            if note.author_id != current_user.id:
+                shared_note = SharedNotes.query.filter_by(note_id=note.id, user_id=current_user.id).first()
+                if not shared_note or not shared_note.verify_shared_signature():
+                    current_app.logger.warning(f"Failed: Unauthorized access or invalid shared signature for note {note.id} by user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                    flash("You do not have permission to view or decrypt this note.", "danger")
+                    return redirect(url_for("main.dashboard"))
+            if not note.verify_signature():
+                current_app.logger.warning(f"Failed: Signature for {note.id} failed for user {current_user.username} from {request.remote_addr}")
+                flash("Signature verification failed.", "danger")
                 return redirect(url_for("main.dashboard"))
 
             try:
                 decrypted_content = note.decrypt(code.encode('utf-8'))
-                clean_content = sanitize_markdown(decrypted_content)
-                current_app.logger.info(f"Success: Note {note_id} decrypted for user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
-                flash("Note decrypted!", "success")
-                return render_template("view_note.html", note=note, clean_content=clean_content)
+                if decrypted_content:
+                    note.clean_content = sanitize_markdown(decrypted_content.decode("utf-8"))
+                    current_app.logger.info(f"Success: Note {note.id} decrypted and displayed for user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                    flash("Note decrypted!", "success")
+                    return render_template("view_note.html", note=note)
             except ValueError:
-                current_app.logger.warning(f"Failed: Invalid decryption code for note {note_id} by user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                current_app.logger.warning(f"Failed: Invalid decryption code for note {note.id} by user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
                 flash("Invalid passphrase. Unable to decrypt note.", "danger")
     except Exception as e:
-        current_app.logger.exception(f"Error: during decryption for note {note_id} by user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        current_app.logger.exception(f"Error: during decryption for note {note.id} by user {current_user.username} from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
         flash("An unexpected error occurred. Please try again.", "danger")
 
     return redirect(url_for("main.dashboard"))
-
-@app_bp.route("/view-note/<int:note_id>")
-@login_required
-def view_note(note_id):
-    decrypted_content = request.args.get("decrypted_content")
-    try:
-        note = Note.query.filter_by(id=note_id).first()
-
-        if not note:
-            current_app.logger.warning(f"Failed: Note {note_id} not found for user {current_user.username} from {request.remote_addr}")
-            flash("Note not found or you do not have permission to view it.", "danger")
-            return redirect(url_for("main.dashboard"))
-
-        if decrypted_content:
-            note.clean_content = sanitize_markdown(decrypted_content.decode("utf-8"))
-            current_app.logger.info(f"Success: Displayed decrypted note {note_id} for user {current_user.username} from {request.remote_addr}")
-            return render_template("view_note.html", note=note)
-        else:
-            if not note.is_public and note.author_id != current_user.id:
-                current_app.logger.warning(f"Failed: Unauthorized access attempt for note {note_id} by user {current_user.username} from {request.remote_addr}")
-                flash("You do not have permission to view this note.", "danger")
-                return redirect(url_for("main.dashboard"))
-            flash("Failed to retrieve decrypted content.", "danger")
-            return redirect(url_for("main.dashboard"))
-
-    except Exception as e:
-        current_app.logger.exception(f"Error: during viewing note {note_id} by user {current_user.username} from {request.remote_addr}")
-        flash("An unexpected error occurred. Please try again.", "danger")
-    return redirect(url_for("main.dashboard"))
-
 
 @app_bp.route("/public-notes", methods=["GET"])
 @login_required

@@ -23,9 +23,16 @@
             </div>
         </form>
         {% endif %}
-            <p>Written by: {{ note.author.username }}</p>
-    </div>
-{% endfor %}
+        <p>Written by: {{ note.get_username() }}</p>
+        {% if note.note_access|length > 0 %}
+        <p>Shared with:
+            {% for shared_note in note.note_access %}
+                {{ shared_note.get_shared_username() }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% endif %}
+        </div>
+    {% endfor %}
 
 </div>
 {% endblock %}

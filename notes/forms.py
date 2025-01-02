@@ -11,7 +11,7 @@ def calculate_entropy(password):
 def password_strength_check(form, field):
     password = field.data
     entropy = calculate_entropy(password)
-    if entropy < 40:
+    if entropy < 35:
         raise ValidationError(f"Password is too weak.")
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20), Regexp(r'^[a-zA-Z0-9_]+$')])
@@ -28,7 +28,7 @@ class LoginForm(FlaskForm):
 
 class NoteForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired(), Length(max=30), Regexp(r'^[a-zA-Z0-9_]+$')])
-    content = TextAreaField('Write your note here.', validators=[DataRequired(), Regexp(r'^[a-zA-Z0-9#*.,\s\n]+$')])
+    content = TextAreaField('Write your note here.', validators=[DataRequired(), Regexp(r'^[a-zA-Z0-9#*.,?\s\n!\[\]\(\):/_\-\'"`’]+$')])
     is_public = BooleanField('Do you want the note to be public?')
     is_shared = BooleanField('Do you want the note to be shared with chosen users?')
     shared_users = StringField('Usernames to share the note with (comma-separated)', validators=[Length(max=100), Regexp(r'^[a-zA-Z0-9_,]*$')])
@@ -56,6 +56,7 @@ class NoteForm(FlaskForm):
                 password_strength_check(None, field)
             except ValidationError as e:
                 raise ValidationError(str(e))
+
 class DecryptNoteForm(FlaskForm):
     code = StringField('Code', validators=[DataRequired(), Length(min=8, max=40), Regexp(r'^[a-zA-Z0-9_]+$')])
     submit = SubmitField('Decrypt')

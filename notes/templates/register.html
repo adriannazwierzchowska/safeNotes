@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 
 {% block body %}
-
-<h2>Register</h2>
-<form id="auth-form" action="{{url_for('main.register')}}" method="POST">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.username.label }}<br>
-        {{ form.username(size=40) }}
-    </p>
-    <p>
-        {{ form.email.label }}<br>
-        {{ form.email(size=40) }}
-    </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(size=40) }}
-    </p>
-    <p>
-        {{ form.confirm.label }}<br>
-        {{ form.confirm(size=50) }}
-    </p>
-    <p>{{ form.submit() }}</p>
-</form>
-
+<div class="container">
+    <h2>Register</h2>
+    <form id="auth-form" action="{{url_for('main.register')}}" method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=40) }}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=40) }}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=40) }}
+        </p>
+        <p>
+            {{ form.confirm.label }}<br>
+            {{ form.confirm(size=50) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</div>
 {% endblock %}
