@@ -11,13 +11,14 @@
         </p>
         <p>
             {{ form.password.label }}<br>
-            {{ form.password(size=50) }}
+            {{ form.password(size=40) }}
         </p>
         <p>
             {{ form.totp.label }}<br>
-            {{ form.totp(size=6) }}
+            {{ form.totp(size=40) }}
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    <a href="{{ url_for('main.password_reset_request') }}" class="btn btn-nav-pswd">Forgot your password?</a>
 </div>
 {% endblock %}
