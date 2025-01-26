@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container">
     <h2>Login</h2>
-    <form id="auth-form" action="{{url_for('main.login')}}" method="POST">
+    <form id="auth-form" action="{{url_for('auth.login')}}" method="POST">
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
@@ -17,8 +17,11 @@
             {{ form.totp.label }}<br>
             {{ form.totp(size=40) }}
         </p>
+        <div class="hp">
+            {{ form.hp(id=random_id) }}
+        </div>
         <p>{{ form.submit() }}</p>
     </form>
-    <a href="{{ url_for('main.password_reset_request') }}" class="btn btn-nav-pswd">Forgot your password?</a>
+    <a href="{{ url_for('auth.password_reset_request') }}" class="btn btn-nav-pswd">Forgot your password?</a>
 </div>
 {% endblock %}

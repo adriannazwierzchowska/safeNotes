@@ -6,7 +6,7 @@
     <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ qr_code_url }}&size=300x300">
     <p>Or enter this code in the app: <strong>{{ qr_code_url.split('secret=')[1] }}</strong></p>
     <p>After scanning the QR code, please enter your TOTP code below to verify your account:</p>
-    <form id="totp-form" action="{{ url_for('main.register_auth') }}" method="POST">
+    <form id="totp-form" action="{{ url_for('auth.register_auth') }}" method="POST">
         {{ form.hidden_tag() }}
         <p>
             {{ form.totp.label }}<br>

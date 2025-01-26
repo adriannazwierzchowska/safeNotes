@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="container">
-    <form id="note-form" action="{{ url_for('main.add_note') }}" method="POST">
+    <form id="note-form" action="{{ url_for('notes.add_note') }}" method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.title.label }}

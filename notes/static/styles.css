@@ -7,12 +7,13 @@ body {
 }
 
 a {
+  text-transform: uppercase;
   text-decoration: none;
   color: #ECEBDE;
 }
 
 a:hover {
-  text-decoration: underline;
+  font-weight: bold;
 }
 
 .navbar {
@@ -48,6 +49,11 @@ a:hover {
   background: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
 }
 
 h1, h2 {
@@ -106,6 +112,26 @@ form input[type="submit"]:hover {
   background-color: #847D69;
 }
 
+.btn-nav-lighter {
+  background-color: #cfc9b6;
+  color: #fff;
+}
+
+.btn-nav-pswd {
+  background-color: #cfc9b6;
+  color: #fff;
+  margin-top: 10px;
+  text-transform: none;
+}
+
+.btn-nav-pswd:hover {
+  background-color: #847D69;
+}
+
+.btn-nav-lighter:hover {
+  background-color: #847D69;
+}
+
 footer {
   text-align: center;
   background-color: #D7D3BF;
@@ -159,11 +185,13 @@ footer {
 
 .note {
   background-color: #FDFCF5;
-  padding: 1.5rem;
+  padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 700px;
+  margin-bottom:7px;
 }
 
 .note:hover {
@@ -181,6 +209,7 @@ footer {
   font-size: 1rem;
   color: #555;
   line-height: 1.5;
+  margin-bottom: 2rem;
 }
 
 .note form {
@@ -247,5 +276,34 @@ textarea {
     box-sizing: border-box;
 }
 
+.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
 
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+th {
+    text-align: left;
+    background-color: #f4f4f4;
+}
+blockquote {
+    margin: 0 0 1rem;
+    padding: 0.5rem 1rem;
+    border-left: 4px solid #ddd;
+    color: #555;
+}
+
+.hp {
+  display: none;
+}

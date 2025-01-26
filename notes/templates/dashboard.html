@@ -4,8 +4,11 @@
 <div class="container">
     <h1>Welcome, {{ current_user.username | e }}</h1>
     <p>Manage your notes here.</p>
-    <a href="{{ url_for('main.notes') }}" class="btn btn-nav">Your notes</a>
-    <a href="{{ url_for('main.add_note') }}" class="btn btn-nav">Add a note</a>
-    <a href="{{ url_for('main.logout') }}" class="btn btn-nav">Logout</a>
+    <div class="buttons">
+        <a href="{{ url_for('notes.notes') }}" class="btn btn-nav">Your notes</a>
+        <a href="{{ url_for('notes.add_note') }}" class="btn btn-nav">Add a note</a>
+        <a href="{{ url_for('main.login_history') }}" class="btn btn-nav">View Login History</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-nav-lighter">Logout</a>
+    </div>
 </div>
 {% endblock %}

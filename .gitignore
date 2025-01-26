@@ -16,3 +16,6 @@ notes/Lib/
 notes/Scripts/
 
 *.log
+
+docker/nginx/safenotes.key
+docker/nginx/safenotes.crt

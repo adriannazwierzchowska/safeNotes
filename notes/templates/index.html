@@ -16,7 +16,7 @@
             {% endif %}
         </p>
         {% if note.is_encrypted %}
-        <form action="{{ url_for('main.decrypt_notes', note_id=note.id) }}" method="POST">
+        <form action="{{ url_for('notes.decrypt_notes', note_id=note.get_serialized_id()) }}" method="POST">
             {{ decrypt_form.hidden_tag() }}
             <div>
                 {{ decrypt_form.code.label }}

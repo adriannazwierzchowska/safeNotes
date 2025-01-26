@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container">
     <h2>Register</h2>
-    <form id="auth-form" action="{{url_for('main.register')}}" method="POST">
+    <form id="auth-form" action="{{url_for('auth.register')}}" method="POST">
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
