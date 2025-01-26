@@ -1,5 +1,4 @@
-from flask import Flask, flash, redirect, url_for, current_app
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, flash, redirect, url_for
 from extensions import db, login_manager, mail, limiter, csrf
 import logging
 from werkzeug.middleware.proxy_fix import ProxyFix

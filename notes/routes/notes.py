@@ -3,7 +3,6 @@ from ..models import User, Note, SharedNotes, DecryptionError, EncryptionError, 
 from .. import db, login_manager
 from ..forms import NoteForm, DecryptNoteForm
 from flask_login import login_required, current_user
-import time
 import markdown
 import bleach
 
@@ -30,7 +29,7 @@ def home():
                     note.clean_content = sanitize_markdown(note.content)
     except Exception as e:
         public_notes = []
-        current_app.logger.exception(f"Error: during loading public notes from {request.remote_addr} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        current_app.logger.exception(f"Error: during loading public notes from {request.remote_addr}")
         flash("An unexpected error occurred. Please try again.", "danger")
 
     return render_template("index.html", notes=public_notes, decrypt_form=decrypt_form)
@@ -48,7 +47,7 @@ def notes():
         for note in notes:
             if not note.is_encrypted:
                 if not note.verify_signature():
-                    current_app.logger.warning(f"Failed: Signature for note {note.id} failed for user {current_user.username} from {request.remote_addr}")
+                    current_app.logger.warning(f"Failed: Signature for note failed for user {current_user.username} from {request.remote_addr}")
                     flash(f"Signature verification for note titled '{note.title}' failed.", "danger")
                     return redirect(url_for("main.dashboard"))
                 try:
@@ -139,7 +138,7 @@ def decrypt_notes(note_id):
     try:
         note_id = Note.get_deserialized_id(note_id)
         if not note_id:
-            current_app.logger.warning(f"Failed: Invalid note_id {note_id} provided.")
+            current_app.logger.warning(f"Failed: Invalid note_id provided.")
             flash("Please try again.", "danger")
             return redirect(url_for("main.dashboard"))
 
@@ -148,17 +147,19 @@ def decrypt_notes(note_id):
             note = Note.query.filter_by(id=note_id).first()
 
             if not note:
-                current_app.logger.warning(f"Failed: Note {note.id} for decrypting not found for user {current_user.username}.")
+                current_app.logger.warning(f"Failed: Note for decrypting not found for user {current_user.username}.")
                 flash("Note not found or you do not have permission to view it.", "danger")
                 return redirect(url_for("main.dashboard"))
+
             if not note.is_public and note.author_id != current_user.id:
                 shared_note = SharedNotes.query.filter_by(note_id=note.id, user_id=current_user.id).first()
                 if not shared_note or not shared_note.verify_shared_signature():
                     current_app.logger.warning(f"Failed: Unauthorized access or invalid shared signature for note {note.id} by user {current_user.username}.")
                     flash("You do not have permission to view or decrypt this note.", "danger")
                     return redirect(url_for("main.dashboard"))
+
             if not note.verify_signature():
-                current_app.logger.warning(f"Failed: Signature for {note.id} failed for user {current_user.username}.")
+                current_app.logger.warning(f"Failed: Signature verification for {note.id} failed for user {current_user.username}.")
                 flash("Signature verification failed.", "danger")
                 return redirect(url_for("main.dashboard"))
 
@@ -173,30 +174,13 @@ def decrypt_notes(note_id):
                         flash("Decryption failed.", "danger")
                         return redirect(url_for("main.dashboard"))
             except DecryptionError as e:
-                current_app.logger.warning(f"Failed: Invalid decryption code for note {note.id} by user {current_user.username} from {request.remote_addr}.")
+                current_app.logger.warning(f"Failed: Invalid decryption code for note by user {current_user.username} from {request.remote_addr}.")
                 flash("Unable to decrypt note. Please try again", "danger")
                 return redirect(url_for("main.dashboard"))
     except Exception as e:
         current_app.logger.exception(f"Error: during decryption from {request.remote_addr}.")
         flash("An unexpected error occurred. Please try again.", "danger")
     return redirect(url_for("main.dashboard"))
-
-
-@notes_bp.route("/public-notes", methods=["GET"])
-@login_required
-def public_notes():
-    decrypt_form = DecryptNoteForm()
-    try:
-        public_notes = Note.query.filter_by(is_public=True).all()
-        for note in public_notes:
-            if not note.is_encrypted:
-                note.clean_content = sanitize_markdown(note.content)
-
-    except Exception as e:
-        current_app.logger.exception(f"Error: during loading public notes from {request.remote_addr}.")
-        flash("An unexpected error occurred. Please try again.", "danger")
-        public_notes = []
-    return render_template("notes/notes.html", notes=public_notes, decrypt_form=decrypt_form)
 
 
 @login_manager.user_loader

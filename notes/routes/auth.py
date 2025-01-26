@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
-from ..models import User, LoginHistory, EncryptionError, decrypt_data
+from ..models import User, LoginHistory, EncryptionError, decrypt_data, DecryptionError
 from .. import db, login_manager, mail
 from ..forms import RegistrationForm, LoginForm, TOTPAuthForm, PasswordResetRequestForm, PasswordResetForm
 from flask_login import login_user, login_required, logout_user
@@ -58,7 +58,7 @@ def login():
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash(f"{error}", "danger")
+                    flash(f"{field}: {error}", "danger")
     except Exception as e:
         current_app.logger.exception(f"Error: during login from {request.remote_addr}.")
         flash("An unexpected error occurred. Please try again.", "danger")
@@ -85,12 +85,11 @@ def register():
             new_user.set_password(password)
             try:
                 new_user.generate_totp_secret()
-            except EncryptionError as e:
+                totp = pyotp.TOTP(decrypt_data(new_user.totp_secret, "AES_KEY_TOTP"))
+                qr_code_url = totp.provisioning_uri(name=new_user.email, issuer_name="NotesApp")
+            except (EncryptionError, DecryptionError) as e:
                 flash("Couldn't generate your TOTP secret. Please try again.", "danger")
                 return redirect(url_for("auth.register"))
-
-            totp = pyotp.TOTP(decrypt_data(new_user.totp_secret, "AES_KEY_TOTP"))
-            qr_code_url = totp.provisioning_uri(name=new_user.email, issuer_name="NotesApp")
 
             session['new_user'] = {
                 "username": new_user.username,
@@ -116,7 +115,6 @@ def register():
 def register_auth():
     form = TOTPAuthForm()
     if "new_user" not in session:
-        current_app.logger.warning(f"Failed: new user not in session.")
         flash("Please register again.", "danger")
         return redirect(url_for("auth.register"))
     new_user_data = session['new_user']
@@ -131,7 +129,6 @@ def register_auth():
                 return redirect(url_for("auth.register_auth"))
 
             new_user.generate_rsa_keys()
-
             db.session.add(new_user)
             db.session.commit()
             session.pop("new_user", None)
@@ -167,7 +164,7 @@ def password_reset_request():
             email = form.email.data
             totp = form.totp.data
 
-            user = User.query.filter_by(email=email).first()
+            user = User.query.filter_by(username=username, email=email).first()
             if user and user.check_totp(totp):
                 token = user.get_reset_password_token()
 
@@ -186,14 +183,14 @@ def password_reset_request():
                 return redirect(url_for("auth.login"))
             else:
                 time.sleep(DELAY)
-                current_app.logger.warning(f"Failed: password reset email not sent from {request.remote_addr} for user '{username}'.")
+                current_app.logger.warning(f"Failed: password reset email not sent for {request.remote_addr}.")
                 flash("Please try again.", "danger")
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash(f"{error}", "danger")
+                    flash(f"{field}: {error}", "danger")
     except Exception as e:
-        current_app.logger.exception(f"Error: during sending a password reset email from {request.remote_addr}.")
+        current_app.logger.exception(f"Error: during sending a password reset email for {request.remote_addr}.")
         flash("An unexpected error occurred. Please try again.", "danger")
     return render_template("password_reset/password_reset_request.html", form=form)
 

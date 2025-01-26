@@ -19,7 +19,6 @@ RUN mkdir -p /etc/nginx/
 
 COPY docker/nginx/nginx.conf /etc/nginx/
 
-
 RUN mkdir -p /var/log/uwsgi
 RUN chown -R www-data:www-data /var/log/uwsgi
 RUN chown -R www-data:www-data /app
