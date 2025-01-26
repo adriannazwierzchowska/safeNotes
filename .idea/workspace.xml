@@ -5,17 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51501f81-f707-488f-aef4-434c3c643194" name="Changes" comment="Refactorized the code">
-      <change afterPath="$PROJECT_DIR$/docker/nginx/safenotes.crt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/nginx/safenotes.key" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/safeNotes.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/safeNotes.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/docker/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/nginx/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/docker/nginx/nginx.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/notes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notes/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/notes/routes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notes/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/notes/routes/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notes/routes/notes.py" beforeDir="false" afterPath="$PROJECT_DIR$/notes/routes/notes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notes/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/notes/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/uwsgi/uwsgi.ini" beforeDir="false" afterPath="$PROJECT_DIR$/docker/uwsgi/uwsgi.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
