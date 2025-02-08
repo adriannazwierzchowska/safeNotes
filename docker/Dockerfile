@@ -21,6 +21,4 @@ RUN mkdir -p /var/log/uwsgi
 RUN chown -R www-data:www-data /var/log/uwsgi
 RUN chown -R www-data:www-data /app
 
-EXPOSE 500
-
 CMD ["uwsgi", "--ini", "/app/uwsgi.ini"]

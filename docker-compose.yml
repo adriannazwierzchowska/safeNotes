@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    expose:
-      - "5000"
     env_file:
       - .env
     environment:
