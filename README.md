@@ -3,6 +3,13 @@
 A secure note-taking web application built with Flask that emphasizes privacy and security. Features include end-to-end encryption, two-factor authentication, note sharing, and digital signatures.
 The application is deployed in a production-ready configuration using uWSGI and Nginx as reverse proxy.
 
+### Tech Stack
+- Backend: Flask
+- Database: SQLite
+- Frontend: HTML/CSS
+- Server: Nginx + uWSGI
+- Containerization: Docker
+
 ## Features
 
 - **Web Security** 
@@ -28,38 +35,36 @@ The application is deployed in a production-ready configuration using uWSGI and 
   - RSA signatures for author verification
   - AES-GCM encryption
 
-## Installation
+## Preview
+
+##### Public notes
+![](views/public.png)
+
+##### Encrypted notes
+![](views/encrypted.png)
+
+
+## Running the app
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/adzia0/safeNotes.git
+git clone https://github.com/adriannazwierzchowska/safeNotes.git
 cd safenotes
 ```
 
-2. Create and configure the `.env` file:
+2. Create the `.env` file with generated aes keys. You can configure it with your own secret keys and email address.
 ```bash
-SECRET_KEY=your_secret_key
-DATABASE_URL=sqlite:///path/to/your/database.db
-AES_KEY_TOTP=your_aes_key_for_totp
-AES_KEY_RSA=your_aes_key_for_rsa
-AES_KEY_NOTE=your_aes_key_for_notes
-MAIL_SERVER=your_mail_server
-MAIL_PORT=587
-MAIL_USE_TLS=True
-MAIL_USERNAME=your_email
-MAIL_PASSWORD=your_email_password
+python generate_env.py
 ```
 
-3. Generate your  self-signed SSL certificates:
+3. Generate your own self-signed SSL certificates:
 ```bash
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout docker/nginx/safenotes.key \
-  -out docker/nginx/safenotes.crt
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout docker/nginx/safenotes.key -out docker/nginx/safenotes.crt
 ```
 
 4. Build and run with Docker Compose:
 ```bash
-docker-compose up --build
+docker-compose up
 ```
 
 The application will be available at `https://localhost`
